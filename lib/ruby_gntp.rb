@@ -24,8 +24,8 @@
 #   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #   THE SOFTWARE.
 #
-#   日本語訳:
-#   http://www.opensource.jp/licenses/mit-license.html
+#   日本語訳(japanese):
+#     http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
 #
 #}}}
 require 'socket'
