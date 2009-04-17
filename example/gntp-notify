@@ -1,0 +1,19 @@
+#!/usr/bin/ruby
+# Growl notifier command
+# Usage:
+#  gntp-notify [message]
+# License:
+#  public domain
+
+require "rubygems"
+require "ruby_gntp" # >= ver.0.1.0 
+
+msg = ARGV[0] || "Alert!!"
+
+GNTP.notify({
+  :app_name  => "gntp-notify",
+  :title => "from commandline",
+  :text  => msg,
+  :sticky=> true,
+})
+

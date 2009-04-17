@@ -24,13 +24,13 @@
 #   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #   THE SOFTWARE.
 #
-#   日本語訳(japanese):
-#     http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
+#   Japanese:
+#   http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
 #
 #}}}
 require 'socket'
 
-$DEBUG = true
+#$DEBUG = true
 
 class TooFewParametersError < Exception
 end
@@ -49,25 +49,24 @@ class GNTP
   # register
   #
   def register(params)
-    @app_name = params[:app_name]
-    @notifies = params[:notifies]
-    raise TooFewParametersError, "Need least one 'notification' for register" unless @notifies
+    @notifications = params[:notifications]
+    raise TooFewParametersError, "Need least one 'notification' for register" unless @notifications
 
     @app_icon = params[:app_icon]
 
     @message = <<EOF
 GNTP/1.0 REGISTER NONE
 Application-Name: #{@app_name}
-Notifications-Count: #{@notifies.size}
+Notifications-Count: #{@notifications.size}
 EOF
     @message << "Application-Icon: #{@app_icon}\n" if @app_icon
     @message << "\n"
 
-    @notifies.each do |notify|
-      name      = notify[:name]
-      disp_name = notify[:disp_name]
-      enabled   = notify[:enabled]
-      icon      = notify[:icon]
+    @notifications.each do |notification|
+      name      = notification[:name]
+      disp_name = notification[:disp_name]
+      enabled   = notification[:enabled] || true
+      icon      = notification[:icon]
 
       @message += <<EOF
 Notification-Name: #{name}
@@ -112,6 +111,20 @@ EOF
     end
   end
 
+
+  #
+  # instant notification
+  #
+  def self.notify(params)
+    growl = GNTP.new(params[:app_name])
+    notification = params
+    notification[:name] = params[:app_name] || "Ruby/GNTP notification"
+    growl.register(:notifications => [
+      :name => notification[:name]
+    ])
+    growl.notify(notification)
+  end
+
   private
 
   #
@@ -139,7 +152,7 @@ EOF
   # get notification icon
   #
   def get_notification_icon(name)
-    notification = @notifies.find {|n| n[:name] == name}
+    notification = @notifications.find {|n| n[:name] == name}
     return nil unless notification
     return notification[:icon]
   end
@@ -148,20 +161,27 @@ end
 #----------------------------
 # self test code
 if __FILE__ == $0
-  growl = GNTP.new
-  growl.register({
-    :app_name => "Ruby/GNTP self test",
-    :notifies => [{
-      :name     => "hoge",
+  #--- Use standard notification method ('register' first then 'notify')
+  growl = GNTP.new("Ruby/GNTP self test")
+  growl.register({:notifications => [{
+      :name     => "notify",
       :enabled  => true,
-    }]
-  })
+  }]})
 
   growl.notify({
-    :name  => "hoge",
-    :title => "GrowlTestです",
-    :text  => "hogeほげ？",
-    :icon  => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif"
+    :name  => "notify",
+    :title => "Congraturation",
+    :text  => "Congraturation! You are successful install ruby_gntp.",
+    :icon  => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif",
+    :sticky=> true,
+  })
+
+  #--- Use instant notification method (just 'notify')
+  GNTP.notify({
+    :app_name => "Instant notify",
+    :title    => "Instant notification", 
+    :text     => "Instant notification available now.",
+    :icon     => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif",
   })
 end
 

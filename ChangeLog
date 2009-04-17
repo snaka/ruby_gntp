@@ -9,3 +9,7 @@
 == Version 0.0.2
 * Fixed Japanese translated MIT License page URL.
 
+== Version 0.1.0 - 2009/4/17
+* Add GNTP.notify method for instant notification.
+* Add ruby script examples.
+
