@@ -13,3 +13,6 @@
 * Add GNTP.notify method for instant notification.
 * Add ruby script examples.
 
+== Version 0.1.1 - 2009/4/17
+* Add NOTE to example directory.
+
