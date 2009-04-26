@@ -22,7 +22,7 @@
 		h1 .small { font-size: 0.4em; }
 		h1 a { text-decoration: none }
 		h2 { font-size: 1.5em; color: #000257; }
-    h3 { text-align: center; color: #000257; }
+    h3 { font-size: 1em; color: #000257; }
     a { color: #000257; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
     .download { float: right; }
@@ -52,25 +52,45 @@
       Ruby library for GNTP(Growl Notification Transport Protocol) client
     </div>
 
-    <h2>License</h2>
+<h2>License</h2>
 <p>MIT style license</p>
 <h2>Authors</h2>
 <p>snaka</p>
+
 <h2>Contact</h2>
 <p>snaka (snaka.gml@gmail.com)<br/>      </p>
 
+<h2>Install</h2>
+<p>You can install this by gem command like followings.</p>
+<h3>From RubyForge</h3>
+<pre>
+$ gem install ruby_gntp
+</pre>
+<h3>From GitHub</h3>
+<p>
+If you first time to install gems via Github, you need add source url
+by gem command as follows.
+</p>
+<pre>
+ $ gem sources -a http://gems.github.com
+</pre>
+<p> then..</p>
+<pre>
+  $ gem install snaka-ruby_gntp
+</pre>
 
-    <h2>Download</h2>
-    <p>
+<h2>Download</h2>
+  <p>
       You can download this project in either
       <a href="http://github.com/snaka/ruby_gntp/zipball/master">zip</a> or
       <a href="http://github.com/snaka/ruby_gntp/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
+  </p>
+  <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
       by running:
       <pre>$ git clone git://github.com/snaka/ruby_gntp</pre>
-    </p>
-<h2>Example</h2>
+  </p>
+
+<h2>Usage example</h2>
 <p>
 <pre>
 require 'rubygems'
