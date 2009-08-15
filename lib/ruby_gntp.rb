@@ -29,6 +29,7 @@
 #
 #}}}
 require 'socket'
+require 'digest/md5'
 
 #$DEBUG = true
 
@@ -36,13 +37,14 @@ class TooFewParametersError < Exception
 end
 
 class GNTP
-  attr_reader :app_name, :target_host, :target_port
+  attr_reader :app_name, :target_host, :target_port, :password
   attr_reader :message if $DEBUG
 
-  def initialize(app_name = 'Ruby/GNTP', host = 'localhost', port = 23053)
+  def initialize(app_name = 'Ruby/GNTP', host = 'localhost', password = '', port = 23053)
     @app_name    = app_name
     @target_host = host
     @target_port = port
+    @password = password
   end
 
   #
@@ -55,7 +57,7 @@ class GNTP
     @app_icon = params[:app_icon]
 
     @message = <<EOF
-GNTP/1.0 REGISTER NONE
+#{get_gntp_header_start('REGISTER')}
 Application-Name: #{@app_name}
 Notifications-Count: #{@notifications.size}
 EOF
@@ -96,7 +98,7 @@ EOF
     sticky = params[:sticky]
 
     @message = <<EOF
-GNTP/1.0 NOTIFY NONE
+#{get_gntp_header_start('NOTIFY')}
 Application-Name: #{@app_name}
 Notification-Name: #{name}
 Notification-Title: #{title}
@@ -155,6 +157,22 @@ EOF
     notification = @notifications.find {|n| n[:name] == name}
     return nil unless notification
     return notification[:icon]
+  end
+
+  #
+  # get start of the GNTP header
+  #
+  def get_gntp_header_start(type)
+    if @password.empty?
+      "GNTP/1.0 #{type} NONE"
+    else
+      saltvar = Time.now.to_s
+      salt = Digest::MD5.digest(saltvar)
+      salthash = Digest::MD5.hexdigest(saltvar)
+      key = Digest::MD5.digest("#{@password}#{salt}")
+      keyhash = Digest::MD5.hexdigest(key)
+      "GNTP/1.0 #{type} NONE MD5:#{keyhash}.#{salthash}"
+    end
   end
 end
 
