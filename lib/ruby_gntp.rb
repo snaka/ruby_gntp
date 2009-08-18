@@ -55,14 +55,9 @@ class GNTP
     raise TooFewParametersError, "Need least one 'notification' for register" unless @notifications
 
     @app_icon = params[:app_icon]
+    @binaries = []
 
-    @message = <<EOF
-#{get_gntp_header_start('REGISTER')}
-Application-Name: #{@app_name}
-Notifications-Count: #{@notifications.size}
-EOF
-    @message << "Application-Icon: #{@app_icon}\n" if @app_icon
-    @message << "\n"
+    @message = register_header(@app_name, @app_icon, @notifications.size)
 
     @notifications.each do |notification|
       name      = notification[:name]
@@ -70,20 +65,22 @@ EOF
       enabled   = notification[:enabled] || true
       icon      = notification[:icon]
 
-      @message += <<EOF
-Notification-Name: #{name}
-EOF
+      @message << "Notification-Name: #{name}\n"
       @message << "Notification-Display-Name: #{disp_name}\n" if disp_name
       @message << "Notification-Enabled: #{enabled}\n"        if enabled
-      @message << "Notification-Icon: #{icon}\n"              if icon
-      @message << "\n"
+      @message << "#{handle_icon(icon, 'Notification')}\n"    if icon
     end
+
+    @binaries.each {|binary|
+      @message << output_binary(binary)
+    }
+
+    @message << "\n"
 
     unless (ret = send_and_recieve(@message))
       raise "Register failed"
     end
   end
-
 
   #
   # notify
@@ -97,15 +94,14 @@ EOF
     icon   = params[:icon] || get_notification_icon(name)
     sticky = params[:sticky]
 
-    @message = <<EOF
-#{get_gntp_header_start('NOTIFY')}
-Application-Name: #{@app_name}
-Notification-Name: #{name}
-Notification-Title: #{title}
-EOF
-    @message << "Notification-Text: #{text}\n"     if text
-    @message << "Notification-Sticky: #{sticky}\n" if sticky
-    @message << "Notification-Icon: #{icon}\n"     if icon
+    @binaries = []
+
+    @message = notify_header(app_name, name, title, text, sticky, icon)
+
+    @binaries.each {|binary|
+      @message << output_binary(binary)
+    }
+
     @message << "\n"
 
     unless (ret = send_and_recieve(@message))
@@ -160,6 +156,30 @@ EOF
   end
 
   #
+  # outputs the registration header
+  #
+  def register_header(app_name, app_icon, notifications_size)
+    message =  "#{get_gntp_header_start('REGISTER')}\n"
+    message << "Application-Name: #{app_name}\n"
+    message << "#{handle_icon(@app_icon, 'Application')}\n" if app_icon
+    message << "Notifications-Count: #{notifications_size}\n"
+    message << "\n"
+  end
+
+  #
+  # outputs the notification header
+  #
+  def notify_header(app_name, name, title, text, sticky, icon)
+    @message =  "#{get_gntp_header_start('NOTIFY')}\n"
+    @message << "Application-Name: #{@app_name}\n"
+    @message << "Notification-Name: #{name}\n"
+    @message << "Notification-Title: #{title}\n"
+    @message << "Notification-Text: #{text}\n"            if text
+    @message << "Notification-Sticky: #{sticky}\n"        if sticky
+    @message << "#{handle_icon(icon, 'Notification')}\n"  if icon
+  end
+
+  #
   # get start of the GNTP header
   #
   def get_gntp_header_start(type)
@@ -173,6 +193,43 @@ EOF
       keyhash = Digest::MD5.hexdigest(key)
       "GNTP/1.0 #{type} NONE MD5:#{keyhash}.#{salthash}"
     end
+  end
+
+  #
+  # figure out how to handle the icon
+  #   a URL icon just gets put into the header
+  #   a file icon gets read and stored, ready to be appended to the end of the request
+  #
+  def handle_icon(icon, type)
+    if File.exists?(icon)
+      file = File.new(icon)
+      data = file.read
+      size = data.length
+      if size > 0
+        binary = {
+          :size => size,
+          :data => data,
+          :uniqueid => Digest::MD5.hexdigest(data)
+        }
+        @binaries << binary
+        "#{type}-Icon: x-growl-resource://#{binary[:uniqueid]}"
+      end
+    else
+      "#{type}-Icon: #{icon}"
+    end
+  end
+
+  #
+  # outputs any binary data to be sent
+  #
+  def output_binary(binary)
+<<EOF
+
+Identifier: #{binary[:uniqueid]}
+Length: #{binary[:size]}
+
+#{binary[:data]}
+EOF
   end
 end
 
