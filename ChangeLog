@@ -16,3 +16,6 @@
 == Version 0.1.1 - 2009/4/17
 * Add NOTE to example directory.
 
+== Version 0.1.2 - 2009/08/15
+* Enabled password authentication mainly for sending notifications to a network machine.
+
