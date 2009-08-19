@@ -170,13 +170,13 @@ class GNTP
   # outputs the notification header
   #
   def notify_header(app_name, name, title, text, sticky, icon)
-    @message =  "#{get_gntp_header_start('NOTIFY')}\n"
-    @message << "Application-Name: #{@app_name}\n"
-    @message << "Notification-Name: #{name}\n"
-    @message << "Notification-Title: #{title}\n"
-    @message << "Notification-Text: #{text}\n"            if text
-    @message << "Notification-Sticky: #{sticky}\n"        if sticky
-    @message << "#{handle_icon(icon, 'Notification')}\n"  if icon
+    message =  "#{get_gntp_header_start('NOTIFY')}\n"
+    message << "Application-Name: #{@app_name}\n"
+    message << "Notification-Name: #{name}\n"
+    message << "Notification-Title: #{title}\n"
+    message << "Notification-Text: #{text}\n"            if text
+    message << "Notification-Sticky: #{sticky}\n"        if sticky
+    message << "#{handle_icon(icon, 'Notification')}\n"  if icon
   end
 
   #
