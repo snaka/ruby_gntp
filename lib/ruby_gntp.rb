@@ -195,7 +195,7 @@ class GNTP
     if ENV['OS']
       ver = `ver`
       if ver.index('[')
-        matches = ver.scan(/(.*)\[+(.*)\]+/)
+        matches = ver.scan(/(.*)\[+(.*)\]+/)[0]
         platformname, platformversion = matches[0], matches[1]
       else
         platformname, platformversion = 'Microsoft Windows', ver
