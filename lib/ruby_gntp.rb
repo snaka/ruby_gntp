@@ -40,6 +40,9 @@ class GNTP
   attr_reader :app_name, :target_host, :target_port, :password
   attr_reader :message if $DEBUG
 
+  RUBY_GNTP_NAME = 'ruby_gntp'
+  RUBY_GNTP_VERSION = '0.1.3'
+
   def initialize(app_name = 'Ruby/GNTP', host = 'localhost', password = '', port = 23053)
     @app_name    = app_name
     @target_host = host
@@ -57,17 +60,21 @@ class GNTP
     @app_icon = params[:app_icon]
     @binaries = []
 
-    @message = register_header(@app_name, @app_icon, @notifications.size)
+    @message = register_header(@app_name, @app_icon)
+    @message << output_origin_headers
+
+    @message << "Notifications-Count: #{@notifications.size}\n"
+    @message << "\n"
 
     @notifications.each do |notification|
       name      = notification[:name]
-      disp_name = notification[:disp_name]
+      disp_name = notification[:disp_name] || name
       enabled   = notification[:enabled] || true
       icon      = notification[:icon]
 
       @message << "Notification-Name: #{name}\n"
-      @message << "Notification-Display-Name: #{disp_name}\n" if disp_name
-      @message << "Notification-Enabled: #{enabled}\n"        if enabled
+      @message << "Notification-Enabled: #{enabled ? 'True' : 'False'}\n"
+      @message << "Notification-Display-Name: #{disp_name}\n"
       @message << "#{handle_icon(icon, 'Notification')}\n"    if icon
     end
 
@@ -97,6 +104,7 @@ class GNTP
     @binaries = []
 
     @message = notify_header(app_name, name, title, text, sticky, icon)
+    @message << output_origin_headers
 
     @binaries.each {|binary|
       @message << output_binary(binary)
@@ -158,12 +166,10 @@ class GNTP
   #
   # outputs the registration header
   #
-  def register_header(app_name, app_icon, notifications_size)
+  def register_header(app_name, app_icon)
     message =  "#{get_gntp_header_start('REGISTER')}\n"
     message << "Application-Name: #{app_name}\n"
     message << "#{handle_icon(@app_icon, 'Application')}\n" if app_icon
-    message << "Notifications-Count: #{notifications_size}\n"
-    message << "\n"
   end
 
   #
@@ -177,6 +183,29 @@ class GNTP
     message << "Notification-Text: #{text}\n"            if text
     message << "Notification-Sticky: #{sticky}\n"        if sticky
     message << "#{handle_icon(icon, 'Notification')}\n"  if icon
+  end
+
+  def output_origin_headers
+    message =  "Origin-Machine-Name: #{Socket.gethostname}\n"
+    message << "Origin-Software-Name: #{RUBY_GNTP_NAME}\n"
+    message << "Origin-Software-Version: #{RUBY_GNTP_VERSION}\n"
+
+    platformname, platformversion = '', ''
+
+    if ENV['OS']
+      ver = `ver`
+      if ver.index('[')
+        matches = ver.scan(/(.*)\[+(.*)\]+/)
+        platformname, platformversion = matches[0], matches[1]
+      else
+        platformname, platformversion = 'Microsoft Windows', ver
+      end
+    else
+      platformname, platformversion = `uname -s`, `uname -r`
+    end
+
+    message << "Origin-Platform-Name: #{platformname.strip}\n"
+    message << "Origin-Platform-Version: #{platformversion.strip}\n"
   end
 
   #
