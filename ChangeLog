@@ -19,3 +19,8 @@
 == Version 0.1.2 - 2009/08/15
 * Enabled password authentication mainly for sending notifications to a network machine.
 
+== Version 0.1.3 - 2009/08/19
+* Added notification icon sending.
+* Now sends out Origin-X headers.
+* Use \r\n instead of \n in the header lines.
+
