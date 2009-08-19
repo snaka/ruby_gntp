@@ -63,8 +63,8 @@ class GNTP
     @message = register_header(@app_name, @app_icon)
     @message << output_origin_headers
 
-    @message << "Notifications-Count: #{@notifications.size}\n"
-    @message << "\n"
+    @message << "Notifications-Count: #{@notifications.size}\r\n"
+    @message << "\r\n"
 
     @notifications.each do |notification|
       name      = notification[:name]
@@ -72,17 +72,17 @@ class GNTP
       enabled   = notification[:enabled] || true
       icon      = notification[:icon]
 
-      @message << "Notification-Name: #{name}\n"
-      @message << "Notification-Enabled: #{enabled ? 'True' : 'False'}\n"
-      @message << "Notification-Display-Name: #{disp_name}\n"
-      @message << "#{handle_icon(icon, 'Notification')}\n"    if icon
+      @message << "Notification-Name: #{name}\r\n"
+      @message << "Notification-Enabled: #{enabled ? 'True' : 'False'}\r\n"
+      @message << "Notification-Display-Name: #{disp_name}\r\n"
+      @message << "#{handle_icon(icon, 'Notification')}\r\n"    if icon
     end
 
     @binaries.each {|binary|
       @message << output_binary(binary)
     }
 
-    @message << "\n"
+    @message << "\r\n"
 
     unless (ret = send_and_recieve(@message))
       raise "Register failed"
@@ -110,7 +110,7 @@ class GNTP
       @message << output_binary(binary)
     }
 
-    @message << "\n"
+    @message << "\r\n"
 
     unless (ret = send_and_recieve(@message))
       raise "Notify failed"
@@ -137,7 +137,6 @@ class GNTP
   # send and recieve
   #
   def send_and_recieve msg
-    msg.gsub!(/\n/, "\r\n")
     print msg if $DEBUG
 
     sock = TCPSocket.open(@target_host, @target_port)
@@ -167,28 +166,28 @@ class GNTP
   # outputs the registration header
   #
   def register_header(app_name, app_icon)
-    message =  "#{get_gntp_header_start('REGISTER')}\n"
-    message << "Application-Name: #{app_name}\n"
-    message << "#{handle_icon(@app_icon, 'Application')}\n" if app_icon
+    message =  "#{get_gntp_header_start('REGISTER')}\r\n"
+    message << "Application-Name: #{app_name}\r\n"
+    message << "#{handle_icon(@app_icon, 'Application')}\r\n" if app_icon
   end
 
   #
   # outputs the notification header
   #
   def notify_header(app_name, name, title, text, sticky, icon)
-    message =  "#{get_gntp_header_start('NOTIFY')}\n"
-    message << "Application-Name: #{@app_name}\n"
-    message << "Notification-Name: #{name}\n"
-    message << "Notification-Title: #{title}\n"
-    message << "Notification-Text: #{text}\n"            if text
-    message << "Notification-Sticky: #{sticky}\n"        if sticky
-    message << "#{handle_icon(icon, 'Notification')}\n"  if icon
+    message =  "#{get_gntp_header_start('NOTIFY')}\r\n"
+    message << "Application-Name: #{@app_name}\r\n"
+    message << "Notification-Name: #{name}\r\n"
+    message << "Notification-Title: #{title}\r\n"
+    message << "Notification-Text: #{text}\r\n"            if text
+    message << "Notification-Sticky: #{sticky}\r\n"        if sticky
+    message << "#{handle_icon(icon, 'Notification')}\r\n"  if icon
   end
 
   def output_origin_headers
-    message =  "Origin-Machine-Name: #{Socket.gethostname}\n"
-    message << "Origin-Software-Name: #{RUBY_GNTP_NAME}\n"
-    message << "Origin-Software-Version: #{RUBY_GNTP_VERSION}\n"
+    message =  "Origin-Machine-Name: #{Socket.gethostname}\r\n"
+    message << "Origin-Software-Name: #{RUBY_GNTP_NAME}\r\n"
+    message << "Origin-Software-Version: #{RUBY_GNTP_VERSION}\r\n"
 
     platformname, platformversion = '', ''
 
@@ -204,8 +203,8 @@ class GNTP
       platformname, platformversion = `uname -s`, `uname -r`
     end
 
-    message << "Origin-Platform-Name: #{platformname.strip}\n"
-    message << "Origin-Platform-Version: #{platformversion.strip}\n"
+    message << "Origin-Platform-Name: #{platformname.strip}\r\n"
+    message << "Origin-Platform-Version: #{platformversion.strip}\r\n"
   end
 
   #
@@ -252,13 +251,11 @@ class GNTP
   # outputs any binary data to be sent
   #
   def output_binary(binary)
-<<EOF
-
-Identifier: #{binary[:uniqueid]}
-Length: #{binary[:size]}
-
-#{binary[:data]}
-EOF
+    message =  "\r\n"
+    message << "Identifier: #{binary[:uniqueid]}\r\n"
+    message << "Length: #{binary[:size]}\r\n"
+    message << "\r\n"
+    message << "#{binary[:data]}\r\n"
   end
 end
 
