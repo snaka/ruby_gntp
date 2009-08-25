@@ -41,7 +41,7 @@ class GNTP
   attr_reader :message if $DEBUG
 
   RUBY_GNTP_NAME = 'ruby_gntp'
-  RUBY_GNTP_VERSION = '0.1.3'
+  RUBY_GNTP_VERSION = '0.1.3.1'
 
   def initialize(app_name = 'Ruby/GNTP', host = 'localhost', password = '', port = 23053)
     @app_name    = app_name
@@ -229,7 +229,7 @@ class GNTP
   #   a file icon gets read and stored, ready to be appended to the end of the request
   #
   def handle_icon(icon, type)
-    if File.exists?(icon)
+    if File.exists?(icon) && @target_host != 'localhost'
       file = File.new(icon)
       data = file.read
       size = data.length
