@@ -122,7 +122,11 @@ class GNTP
   # instant notification
   #
   def self.notify(params)
-    growl = GNTP.new(params[:app_name])
+    host    = params[:host]
+    passwd  = params[:passwd]
+
+    growl = GNTP.new(params[:app_name], host, passwd)
+
     notification = params
     notification[:name] = params[:app_name] || "Ruby/GNTP notification"
     growl.register(:notifications => [
@@ -169,6 +173,7 @@ class GNTP
     message =  "#{get_gntp_header_start('REGISTER')}\r\n"
     message << "Application-Name: #{app_name}\r\n"
     message << "#{handle_icon(@app_icon, 'Application')}\r\n" if app_icon
+    message
   end
 
   #
@@ -182,6 +187,7 @@ class GNTP
     message << "Notification-Text: #{text}\r\n"            if text
     message << "Notification-Sticky: #{sticky}\r\n"        if sticky
     message << "#{handle_icon(icon, 'Notification')}\r\n"  if icon
+    message
   end
 
   def output_origin_headers
@@ -262,24 +268,29 @@ end
 #----------------------------
 # self test code
 if __FILE__ == $0
-  #--- Use standard notification method ('register' first then 'notify')
-  growl = GNTP.new("Ruby/GNTP self test")
-  growl.register({:notifications => [{
-      :name     => "notify",
-      :enabled  => true,
-  }]})
+  host = ARGV[0] || 'loaclhost'
+  passwd = host && ARGV[1] 
 
-  growl.notify({
+  #--- Use standard notification method ('register' first then 'notify')
+  growl = GNTP.new("Ruby/GNTP self test", host, passwd)
+  growl.register(:notifications => [{
+      :name     => "notify",
+      :enabled  => true
+  }])
+
+  growl.notify(
     :name  => "notify",
     :title => "Congraturation",
     :text  => "Congraturation! You are successful install ruby_gntp.",
     :icon  => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif",
-    :sticky=> true,
-  })
+    :sticky=> true
+  )
 
   #--- Use instant notification method (just 'notify')
   GNTP.notify({
     :app_name => "Instant notify",
+    :host     => host,
+    :passwd   => passwd,
     :title    => "Instant notification", 
     :text     => "Instant notification available now.",
     :icon     => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif",

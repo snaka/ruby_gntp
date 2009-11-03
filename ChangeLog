@@ -24,3 +24,7 @@
 * Now sends out Origin-X headers.
 * Use \r\n instead of \n in the header lines.
 
+== Version 0.2.0 - 2009/11/03
+* Merge spidahman's commits. Lot of thanks, spidahman!
+* Add some test(spec).
+
