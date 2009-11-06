@@ -41,7 +41,7 @@ class GNTP
   attr_reader :message if $DEBUG
 
   RUBY_GNTP_NAME = 'ruby_gntp'
-  RUBY_GNTP_VERSION = '0.2.1'
+  RUBY_GNTP_VERSION = '0.2.2'
 
   def initialize(app_name = 'Ruby/GNTP', host = 'localhost', password = '', port = 23053)
     @app_name    = app_name
@@ -268,7 +268,7 @@ end
 #----------------------------
 # self test code
 if __FILE__ == $0
-  host = ARGV[0] || 'loaclhost'
+  host = ARGV[0] || 'localhost'
   passwd = ARGV[1] || ''
 
   #--- Use standard notification method ('register' first then 'notify')
