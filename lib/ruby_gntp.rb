@@ -30,6 +30,7 @@
 #}}}
 require 'socket'
 require 'digest/md5'
+require 'rbconfig'
 
 #$DEBUG = true
 
@@ -197,7 +198,7 @@ class GNTP
 
     platformname, platformversion = '', ''
 
-    if ENV['OS']
+    if Config::CONFIG['host_os'] =~ /mswin/
       ver = `ver`
       if ver.index('[')
         matches = ver.scan(/(.*)\[+(.*)\]+/)[0]
