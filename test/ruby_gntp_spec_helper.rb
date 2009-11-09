@@ -16,6 +16,12 @@ module GNTPExampleHelperMethods
       ok_response.rewind
     end
 
+    stub(sock).add do |msg|
+      ok_response.seek(0, IO::SEEK_END)
+      ok_response.write msg
+      ok_response.rewind
+    end 
+
     stub(sock).gets do
       ok_response.gets
     end

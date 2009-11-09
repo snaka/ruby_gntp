@@ -42,7 +42,7 @@ class GNTP
   attr_reader :message if $DEBUG
 
   RUBY_GNTP_NAME = 'ruby_gntp'
-  RUBY_GNTP_VERSION = '0.2.3'
+  RUBY_GNTP_VERSION = '0.2.4'
 
   def initialize(app_name = 'Ruby/GNTP', host = 'localhost', password = '', port = 23053)
     @app_name    = app_name
@@ -61,11 +61,11 @@ class GNTP
     @app_icon = params[:app_icon]
     @binaries = []
 
-    @message = register_header(@app_name, @app_icon)
-    @message << output_origin_headers
+    message = register_header(@app_name, @app_icon)
+    message << output_origin_headers
 
-    @message << "Notifications-Count: #{@notifications.size}\r\n"
-    @message << "\r\n"
+    message << "Notifications-Count: #{@notifications.size}\r\n"
+    message << "\r\n"
 
     @notifications.each do |notification|
       name      = notification[:name]
@@ -73,19 +73,19 @@ class GNTP
       enabled   = notification[:enabled] || true
       icon      = notification[:icon]
 
-      @message << "Notification-Name: #{name}\r\n"
-      @message << "Notification-Enabled: #{enabled ? 'True' : 'False'}\r\n"
-      @message << "Notification-Display-Name: #{disp_name}\r\n"
-      @message << "#{handle_icon(icon, 'Notification')}\r\n"    if icon
+      message << "Notification-Name: #{name}\r\n"
+      message << "Notification-Enabled: #{enabled ? 'True' : 'False'}\r\n"
+      message << "Notification-Display-Name: #{disp_name}\r\n"
+      message << "#{handle_icon(icon, 'Notification')}\r\n"    if icon
     end
 
     @binaries.each {|binary|
-      @message << output_binary(binary)
+      message << output_binary(binary)
     }
 
-    @message << "\r\n"
+    message << "\r\n"
 
-    unless (ret = send_and_recieve(@message))
+    unless (ret = send_and_recieve(message))
       raise "Register failed"
     end
   end
@@ -93,7 +93,7 @@ class GNTP
   #
   # notify
   #
-  def notify(params)
+  def notify(params, &callback)
     name   = params[:name]
     raise TooFewParametersError, "Notification need 'name', 'title' parameters" unless name || title
 
@@ -101,19 +101,25 @@ class GNTP
     text   = params[:text]
     icon   = params[:icon] || get_notification_icon(name)
     sticky = params[:sticky]
+    callback_context = params[:callback_context]
+    callback_context_type = params[:callback_context_type]
 
     @binaries = []
 
-    @message = notify_header(app_name, name, title, text, sticky, icon)
-    @message << output_origin_headers
+    message = notify_header(app_name, name, title, text, sticky, icon)
+    message << output_origin_headers
+    if callback || callback_context
+      message << "Notification-Callback-Context: #{callback_context || '(none)'}\r\n"
+      message << "Notification-Callback-Context-Type: #{callback_context_type || '(none)'}\r\n"
+    end
 
     @binaries.each {|binary|
-      @message << output_binary(binary)
+      message << output_binary(binary)
     }
 
-    @message << "\r\n"
+    message << "\r\n"
 
-    unless (ret = send_and_recieve(@message))
+    unless (ret = send_and_recieve(message, callback))
       raise "Notify failed"
     end
   end
@@ -122,7 +128,7 @@ class GNTP
   #
   # instant notification
   #
-  def self.notify(params)
+  def self.notify(params, &callback)
     host    = params[:host]
     passwd  = params[:passwd]
 
@@ -133,7 +139,7 @@ class GNTP
     growl.register(:notifications => [
       :name => notification[:name]
     ])
-    growl.notify(notification)
+    growl.notify(notification, &callback)
   end
 
   private
@@ -141,7 +147,7 @@ class GNTP
   #
   # send and recieve
   #
-  def send_and_recieve msg
+  def send_and_recieve(msg, callback=nil)
     print msg if $DEBUG
 
     sock = TCPSocket.open(@target_host, @target_port)
@@ -153,8 +159,24 @@ class GNTP
       print ">#{rcv}" if $DEBUG
       ret = $1 if /GNTP\/1.0\s+-(\S+)/ =~ rcv
     end
-    sock.close
 
+    if callback
+      Thread.new do 
+        response = {}
+        while rcv = sock.gets
+          break if rcv == "\r\n"
+          print ">>#{rcv}" if $DEBUG
+          response[:callback_result]        = $1 if /Notification-Callback-Result:\s+(\S*)\r\n/ =~ rcv
+          response[:callback_context]       = $1 if /Notification-Callback-Context:\s+(\S*)\r\n/ =~ rcv
+          response[:callback_context_type]  = $1 if /Notification-Callback-Context-Type:\s+(\S*)\r\n/ =~ rcv
+        end
+        callback.call(response)
+        sock.close
+      end
+      return true
+    end
+
+    sock.close
     return 'OK' == ret
   end
 
@@ -285,7 +307,9 @@ if __FILE__ == $0
     :text  => "Congraturation! You are successful install ruby_gntp.",
     :icon  => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif",
     :sticky=> true
-  )
+  ) do |response|
+    p response
+  end
 
   #--- Use instant notification method (just 'notify')
   GNTP.notify({
@@ -295,7 +319,14 @@ if __FILE__ == $0
     :title    => "Instant notification", 
     :text     => "Instant notification available now.",
     :icon     => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif",
-  })
+  }) do |response|
+    p response
+  end
+
+  #--- wait
+  puts
+  puts "press enter key to finish."
+  a = STDIN.gets
 end
 
 # vim: ts=2 sw=2 expandtab fdm=marker
