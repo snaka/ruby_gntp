@@ -38,17 +38,17 @@ class TooFewParametersError < Exception
 end
 
 class GNTP
-  attr_reader :app_name, :target_host, :target_port, :password
+  attr_reader :app_name, :target_host, :target_port
   attr_reader :message if $DEBUG
 
   RUBY_GNTP_NAME = 'ruby_gntp'
-  RUBY_GNTP_VERSION = '0.2.4'
+  RUBY_GNTP_VERSION = '0.3.0'
 
   def initialize(app_name = 'Ruby/GNTP', host = 'localhost', password = '', port = 23053)
-    @app_name    = app_name
-    @target_host = host
-    @target_port = port
-    @password = password
+    @app_name     = app_name
+    @target_host  = host
+    @target_port  = port
+    @password     = password
   end
 
   #
@@ -56,9 +56,10 @@ class GNTP
   #
   def register(params)
     @notifications = params[:notifications]
+    @app_icon = params[:app_icon]
+
     raise TooFewParametersError, "Need least one 'notification' for register" unless @notifications
 
-    @app_icon = params[:app_icon]
     @binaries = []
 
     message = register_header(@app_name, @app_icon)
@@ -95,14 +96,14 @@ class GNTP
   #
   def notify(params, &callback)
     name   = params[:name]
-    raise TooFewParametersError, "Notification need 'name', 'title' parameters" unless name || title
-
     title  = params[:title]
     text   = params[:text]
     icon   = params[:icon] || get_notification_icon(name)
     sticky = params[:sticky]
     callback_context = params[:callback_context]
     callback_context_type = params[:callback_context_type]
+
+    raise TooFewParametersError, "Notification need 'name', 'title' parameters" unless name || title
 
     @binaries = []
 
@@ -220,6 +221,9 @@ class GNTP
 
     platformname, platformversion = '', ''
 
+    # see Proper way to detect Windows platform in Ruby - The Empty Way
+    #     http://blog.emptyway.com/2009/11/03/proper-way-to-detect-windows-platform-in-ruby/
+    #
     if Config::CONFIG['host_os'] =~ /mswin/
       ver = `ver`
       if ver.index('[')
