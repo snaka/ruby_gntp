@@ -28,3 +28,10 @@
 * Merge spidahman's commits. Lot of thanks, spidahman!
 * Add some test(spec).
 
+== Version 0.3.0 - yyyy/mm/dd
+
+== Version 0.3.1 - yyyy/mm/dd
+
+== Version 0.3.2 - 2010/01/26
+* Temporary patchwork fix - The code was commented out that recognize version
+of the OS causes some defects -

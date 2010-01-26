@@ -42,7 +42,7 @@ class GNTP
   attr_reader :message if $DEBUG
 
   RUBY_GNTP_NAME = 'ruby_gntp'
-  RUBY_GNTP_VERSION = '0.3.1'
+  RUBY_GNTP_VERSION = '0.3.3'
 
   def initialize(app_name = 'Ruby/GNTP', host = 'localhost', password = '', port = 23053)
     @app_name     = app_name
@@ -219,22 +219,26 @@ class GNTP
     message << "Origin-Software-Name: #{RUBY_GNTP_NAME}\r\n"
     message << "Origin-Software-Version: #{RUBY_GNTP_VERSION}\r\n"
 
-    platformname, platformversion = '', ''
+    platformname = platformversion = ''
 
+    # These causes a problem... temporary patchwork fix
+    #
     # see Proper way to detect Windows platform in Ruby - The Empty Way
     #     http://blog.emptyway.com/2009/11/03/proper-way-to-detect-windows-platform-in-ruby/
     #
-    if Config::CONFIG['host_os'] =~ /mswin/
-      ver = `ver`
-      if ver.index('[')
-        matches = ver.scan(/(.*)\[+(.*)\]+/)[0]
-        platformname, platformversion = matches[0], matches[1]
-      else
-        platformname, platformversion = 'Microsoft Windows', ver
-      end
-    else
-      platformname, platformversion = `uname -s`, `uname -r`
-    end
+    #if Config::CONFIG['host_os'] =~ /mswin/
+    #  ver = `ver`
+    #  if ver.index('[')
+    #    matches = ver.scan(/(.*)\[+(.*)\]+/)[0]
+    #    platformname, platformversion = matches[0], matches[1]
+    #  else
+    #    platformname, platformversion = 'Microsoft Windows', ver
+    #  end
+    #else
+    #  platformname, platformversion = `uname -s`, `uname -r`
+    #end
+    platformname = "Windows"
+    platformname = "0.0"
 
     message << "Origin-Platform-Name: #{platformname.strip}\r\n"
     message << "Origin-Platform-Version: #{platformversion.strip}\r\n"
