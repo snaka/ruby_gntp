@@ -1,14 +1,18 @@
+require 'lib/ruby_gntp'
+
 Gem::Specification.new do |s|
-  s.name = "ruby_gntp"
-  s.version = "0.1.1"
+  s.name = GNTP::RUBY_GNTP_NAME
+  s.version = GNTP::RUBY_GNTP_VERSION
   s.summary = "Ruby library for GNTP(Growl Notification Transport Protocol) client"
-  s.author = "snaka"
-  s.email = "snaka.gml@gmail.com"
+  s.authors = ["snaka", "David Hayward (spidah)"]
+  s.email = ["snaka.gml@gmail.com", "spidahman@gmail.com"]
   s.homepage = "http://snaka.github.com/ruby_gntp/"
   s.files = [
     "lib/ruby_gntp.rb",
     "example/twitter_notifier.rb",
     "example/gntp-notify",
+    "test/ruby_gntp_spec.rb",
+    "test/ruby_gntp_spec_helper.rb",
     "README",
     "TODO",
     "ChangeLog"
