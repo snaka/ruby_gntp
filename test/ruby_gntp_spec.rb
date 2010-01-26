@@ -137,4 +137,8 @@ describe GNTP do
     }
   end
 
+  it "should send instantly" do
+    GNTP.notify :app_name => "App", :title => "title", :text => "text message"
+  end
+
 end

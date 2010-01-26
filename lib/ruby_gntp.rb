@@ -42,7 +42,7 @@ class GNTP
   attr_reader :message if $DEBUG
 
   RUBY_GNTP_NAME = 'ruby_gntp'
-  RUBY_GNTP_VERSION = '0.3.0'
+  RUBY_GNTP_VERSION = '0.3.1'
 
   def initialize(app_name = 'Ruby/GNTP', host = 'localhost', password = '', port = 23053)
     @app_name     = app_name
@@ -244,7 +244,7 @@ class GNTP
   # get start of the GNTP header
   #
   def get_gntp_header_start(type)
-    if @password.empty?
+    if !@password || @password.empty?
       "GNTP/1.0 #{type} NONE"
     else
       saltvar = Time.now.to_s
