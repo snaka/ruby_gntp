@@ -42,7 +42,7 @@ class GNTP
   attr_reader :message if $DEBUG
 
   RUBY_GNTP_NAME = 'ruby_gntp'
-  RUBY_GNTP_VERSION = '0.3.3'
+  RUBY_GNTP_VERSION = '0.3.4'
 
   def initialize(app_name = 'Ruby/GNTP', host = 'localhost', password = '', port = 23053)
     @app_name     = app_name
@@ -75,16 +75,17 @@ class GNTP
       icon      = notification[:icon]
 
       message << "Notification-Name: #{name}\r\n"
-      message << "Notification-Enabled: #{enabled ? 'True' : 'False'}\r\n"
       message << "Notification-Display-Name: #{disp_name}\r\n"
+      message << "Notification-Enabled: #{enabled ? 'True' : 'False'}\r\n"
       message << "#{handle_icon(icon, 'Notification')}\r\n"    if icon
+      message << "\r\n"
     end
 
     @binaries.each {|binary|
       message << output_binary(binary)
+      message << "\r\n"
     }
 
-    message << "\r\n"
 
     unless (ret = send_and_recieve(message))
       raise "Register failed"
@@ -238,7 +239,7 @@ class GNTP
     #  platformname, platformversion = `uname -s`, `uname -r`
     #end
     platformname = "Windows"
-    platformname = "0.0"
+    platformversion = "0.0"
 
     message << "Origin-Platform-Name: #{platformname.strip}\r\n"
     message << "Origin-Platform-Version: #{platformversion.strip}\r\n"

@@ -11,7 +11,9 @@ describe GNTP do
   include GNTPExampleHelperMethods
 
   DEFAULT_APP_NAME  = "Ruby/GNTP"
-  NOTIFICATION_NAME = "TestApp"
+  NOTIFICATION_NAME = "Notify"
+  NOTIFICATION_NAME2 = "Notify2"
+  NOTIFICATION_NAME3 = "Notify3"
 
   before do
     @sended_messages = []
@@ -19,7 +21,7 @@ describe GNTP do
     @opened_socket = create_stub_socket(@ok_response, @sended_messages)
   end
 
-  it "can register notifications with minimum params" do
+  it "can register notification with minimum params" do
     @gntp = GNTP.new
     @gntp.register :notifications => [{:name => NOTIFICATION_NAME}]
 
@@ -34,6 +36,36 @@ describe GNTP do
     ].each {|expected_text| 
       @sended_messages.last.should include(expected_text) 
     }
+
+  end
+
+  #
+  it "can register many notifications" do
+    @gntp = GNTP.new
+    @gntp.register :notifications => [
+      {:name => NOTIFICATION_NAME},
+      {:name => NOTIFICATION_NAME2},
+    ]
+
+    @sended_messages.first.should == [
+      "GNTP/1.0 REGISTER NONE\r\n",
+      "Application-Name: #{DEFAULT_APP_NAME}\r\n",
+      "Origin-Machine-Name: #{Socket.gethostname}\r\n",
+      "Origin-Software-Name: #{GNTP::RUBY_GNTP_NAME}\r\n",
+      "Origin-Software-Version: #{GNTP::RUBY_GNTP_VERSION}\r\n",
+      "Origin-Platform-Name: Windows\r\n",
+      "Origin-Platform-Version: 0.0\r\n",
+      "Notifications-Count: 2\r\n",
+      "\r\n",
+      "Notification-Name: #{NOTIFICATION_NAME}\r\n",
+      "Notification-Display-Name: #{NOTIFICATION_NAME}\r\n",
+      "Notification-Enabled: True\r\n",
+      "\r\n",
+      "Notification-Name: #{NOTIFICATION_NAME2}\r\n",
+      "Notification-Display-Name: #{NOTIFICATION_NAME2}\r\n",
+      "Notification-Enabled: True\r\n",
+      "\r\n",
+    ]
 
   end
 
