@@ -20,7 +20,7 @@ module GNTPExampleHelperMethods
       ok_response.seek(0, IO::SEEK_END)
       ok_response.write msg
       ok_response.rewind
-    end 
+    end
 
     stub(sock).gets do
       ok_response.gets

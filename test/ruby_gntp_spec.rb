@@ -33,8 +33,8 @@ describe GNTP do
       "Notification-Name: #{NOTIFICATION_NAME}\r\n",
       "Notification-Display-Name: #{NOTIFICATION_NAME}\r\n",
       "Notification-Enabled: True\r\n"
-    ].each {|expected_text| 
-      @sended_messages.last.should include(expected_text) 
+    ].each {|expected_text|
+      @sended_messages.last.should include(expected_text)
     }
 
   end
@@ -84,8 +84,8 @@ describe GNTP do
       "Notification-Name: #{NOTIFICATION_NAME}\r\n",
       "Notification-Display-Name: #{NOTIFICATION_NAME}\r\n",
       "Notification-Enabled: True\r\n"
-    ].each {|expected_text| 
-      @sended_messages.last.should include(expected_text) 
+    ].each {|expected_text|
+      @sended_messages.last.should include(expected_text)
     }
 
   end
@@ -100,8 +100,8 @@ describe GNTP do
       "Application-Name: #{DEFAULT_APP_NAME}\r\n",
       "Notification-Name: #{NOTIFICATION_NAME}\r\n",
       "Notification-Title: \r\n"
-    ].each {|expected_text| 
-      @sended_messages.last.should include(expected_text) 
+    ].each {|expected_text|
+      @sended_messages.last.should include(expected_text)
     }
   end
 
@@ -129,8 +129,8 @@ describe GNTP do
     [
       "Notification-Callback-Context: (none)\r\n",
       "Notification-Callback-Context-Type: (none)\r\n"
-    ].each {|expected_text| 
-      @sended_messages.last.should include(expected_text) 
+    ].each {|expected_text|
+      @sended_messages.last.should include(expected_text)
     }
 
     # wait for callback called
@@ -149,23 +149,23 @@ describe GNTP do
     [
       "Notification-Callback-Context: (none)\r\n",
       "Notification-Callback-Context-Type: (none)\r\n"
-    ].each {|expected_text| 
-      @sended_messages.last.should_not include(expected_text) 
+    ].each {|expected_text|
+      @sended_messages.last.should_not include(expected_text)
     }
   end
 
   it "should send 'Notification-Callback-*' header when block parameter has not given, but supply :callback_* parameter given" do
     @gntp = GNTP.new
     @gntp.register :notifications => [{:name => NOTIFICATION_NAME}]
-    @gntp.notify :name                  => NOTIFICATION_NAME, 
+    @gntp.notify :name                  => NOTIFICATION_NAME,
                  :callback_context      => 'hoge',
                  :callback_context_type => 'text'
 
     [
       "Notification-Callback-Context: hoge\r\n",
       "Notification-Callback-Context-Type: text\r\n"
-    ].each {|expected_text| 
-      @sended_messages.last.should include(expected_text) 
+    ].each {|expected_text|
+      @sended_messages.last.should include(expected_text)
     }
   end
 

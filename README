@@ -25,7 +25,7 @@ growl.notify({
 # -- Instant notification
 GNTP.notify({
   :app_name => "Instant notify",
-  :title    => "Instant notification", 
+  :title    => "Instant notification",
   :text     => "Instant notification available now.",
   :icon     => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif",
 })
