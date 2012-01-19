@@ -2,6 +2,14 @@ Ruby library for GNTP(Growl Notification Transport Protocol)
 
 Sorry, document is not avilable now.
 
+Priority level mappings
+
+  2 Emergency
+  1 High
+  0 Normal
+  -1 Moderate
+  -2 Very Low
+
 Usage example:
 
 require 'rubygems'
@@ -20,6 +28,7 @@ growl.notify({
   :text  => "Congraturation! You are successful install ruby_gntp.",
   :icon  => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif",
   :sticky=> true,
+  :priority => 2
 })
 
 # -- Instant notification
@@ -28,6 +37,7 @@ GNTP.notify({
   :title    => "Instant notification", 
   :text     => "Instant notification available now.",
   :icon     => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif",
+  :priority => 2
 })
 
 
