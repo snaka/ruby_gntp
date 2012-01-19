@@ -1,4 +1,4 @@
-require 'lib/ruby_gntp'
+require './lib/ruby_gntp'
 
 Gem::Specification.new do |s|
   s.name = GNTP::RUBY_GNTP_NAME
