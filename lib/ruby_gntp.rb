@@ -101,6 +101,7 @@ class GNTP
     text   = params[:text]
     icon   = params[:icon] || get_notification_icon(name)
     sticky = params[:sticky]
+    priority = params[:priority]
     callback_context = params[:callback_context]
     callback_context_type = params[:callback_context_type]
 
@@ -108,7 +109,7 @@ class GNTP
 
     @binaries = []
 
-    message = notify_header(app_name, name, title, text, sticky, icon)
+    message = notify_header(app_name, name, title, text, sticky, icon, priority)
     message << output_origin_headers
     if callback || callback_context
       message << "Notification-Callback-Context: #{callback_context || '(none)'}\r\n"
@@ -204,7 +205,7 @@ class GNTP
   #
   # outputs the notification header
   #
-  def notify_header(app_name, name, title, text, sticky, icon)
+  def notify_header(app_name, name, title, text, sticky, icon, priority)
     message =  "#{get_gntp_header_start('NOTIFY')}\r\n"
     message << "Application-Name: #{@app_name}\r\n"
     message << "Notification-Name: #{name}\r\n"
@@ -212,6 +213,7 @@ class GNTP
     message << "Notification-Text: #{text}\r\n"            if text
     message << "Notification-Sticky: #{sticky}\r\n"        if sticky
     message << "#{handle_icon(icon, 'Notification')}\r\n"  if icon
+    message << "Notification-Priority: #{priority}\r\n"        if priority
     message
   end
 
