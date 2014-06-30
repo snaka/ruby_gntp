@@ -1,8 +1,8 @@
 Attention when twitter_notifier.rb is used
-Following gem is necessary to operate this script. 
+Following gem is necessary to operate this script.
 - json_pure
 - pit
 
-Please ensure that an appropriate value to environment variable EDITOR is set if you start and use Pit. 
-Pit starts executing the editor command set to EDITOR for the edit of account information, and the script will not operate correctly when this variable is not appropriately set. 
+Please ensure that an appropriate value to environment variable EDITOR is set if you start and use Pit.
+Pit starts executing the editor command set to EDITOR for the edit of account information, and the script will not operate correctly when this variable is not appropriately set.
 
