@@ -1,4 +1,5 @@
-require 'lib/ruby_gntp'
+$:.push File.expand_path("../lib", __FILE__)
+require 'ruby_gntp'
 
 Gem::Specification.new do |s|
   s.name = GNTP::RUBY_GNTP_NAME
