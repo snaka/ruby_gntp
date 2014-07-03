@@ -131,10 +131,9 @@ class GNTP
   # instant notification
   #
   def self.notify(params, &callback)
-    host    = params[:host]
-    passwd  = params[:passwd]
+    gntp_args = [params[:app_name], params[:host], params[:passwd]].compact
 
-    growl = GNTP.new(params[:app_name], host, passwd)
+    growl = GNTP.new(*gntp_args)
 
     notification = params
     notification[:name] = params[:app_name] || "Ruby/GNTP notification"
