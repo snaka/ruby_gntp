@@ -268,7 +268,7 @@ class GNTP
   #
   def handle_icon(icon, type)
     if File.exists?(icon) && @target_host != 'localhost'
-      file = File.new(icon)
+      file = File.new(icon, 'rb')
       data = file.read
       size = data.length
       if size > 0
