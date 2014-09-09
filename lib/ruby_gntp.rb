@@ -163,7 +163,7 @@ class GNTP
     end
 
     if callback
-      Thread.new do 
+      Thread.new do
         response = {}
         while rcv = sock.gets
           break if rcv == "\r\n"
@@ -267,7 +267,7 @@ class GNTP
   #   a file icon gets read and stored, ready to be appended to the end of the request
   #
   def handle_icon(icon, type)
-    if File.exists?(icon) && @target_host != 'localhost'
+    if File.exist?(icon) && @target_host != 'localhost'
       file = File.new(icon)
       data = file.read
       size = data.length
@@ -325,7 +325,7 @@ if __FILE__ == $0
     :app_name => "Instant notify",
     :host     => host,
     :passwd   => passwd,
-    :title    => "Instant notification", 
+    :title    => "Instant notification",
     :text     => "Instant notification available now.",
     :icon     => "http://www.hatena.ne.jp/users/sn/snaka72/profile.gif",
   }) do |response|
